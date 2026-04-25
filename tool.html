@@ -292,10 +292,12 @@
   <!-- Firebase認証ガード（画面表示前に確認） -->
   <script>
     const _fbConfig = {
-      apiKey:        "AIzaSyD9D6IE-FdCYOKqVzPpl7E8qK7njnBxqfQ",
-      authDomain:    "image-sorter-5a77d.firebaseapp.com",
-      projectId:     "image-sorter-5a77d",
-      storageBucket: "image-sorter-5a77d.appspot.com"
+      apiKey:            "AIzaSyA_N6mtmZgvCxChjEcJqRGHvKCJw9pWXHE",
+      authDomain:        "sales-management-31979.firebaseapp.com",
+      projectId:         "sales-management-31979",
+      storageBucket:     "sales-management-31979.firebasestorage.app",
+      messagingSenderId: "339482971964",
+      appId:             "1:339482971964:web:3f2551ba94b7a55d361839"
     };
     document.documentElement.classList.add('guard-wait');
 
@@ -354,8 +356,9 @@
         }, 60000);
       });
     } catch (e) {
+      // Firebase初期化失敗 → 安全のためログインページへ強制リダイレクト
       console.error('Firebase初期化エラー:', e);
-      document.documentElement.classList.remove('guard-wait');
+      location.href = 'index.html';
     }
   </script>
 </head>
