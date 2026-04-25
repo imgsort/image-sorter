@@ -3,135 +3,192 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>並び替えツール ログイン</title>
+  <title>画像並び替えツール — ログイン</title>
+  <!-- A-3: CSP（許可ドメインを明示し、外部スクリプト注入を防止） -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' https://www.gstatic.com;
+    style-src  'self' 'unsafe-inline' https://fonts.googleapis.com;
+    font-src   https://fonts.gstatic.com;
+    connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com;
+    img-src    'self' data: blob:;
+    frame-src  'none';
+    object-src 'none';
+  ">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root{
+    :root {
       --bg: #0f172a;
       --card: #0b1220;
       --muted: #94a3b8;
       --text: #e2e8f0;
       --primary: #60a5fa;
-      --primary-strong:#3b82f6;
+      --primary-strong: #3b82f6;
       --ring: rgba(96,165,250,.35);
-      --danger:#ef4444;
-      --ok:#10b981;
+      --danger: #ef4444;
+      --ok: #10b981;
+      --border: rgba(148,163,184,.18);
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0; min-height:100vh; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans JP, sans-serif;
-      background: radial-gradient(1200px 600px at 20% -10%, rgba(96,165,250,.25), transparent 60%),
-                  radial-gradient(900px 500px at 90% 10%, rgba(16,185,129,.2), transparent 60%), var(--bg);
-      color:var(--text); display:grid; place-items:center; padding:24px;
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh;
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', 'Noto Sans JP', sans-serif;
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(96,165,250,.22), transparent 60%),
+        radial-gradient(900px 500px at 90% 10%, rgba(16,185,129,.18), transparent 60%),
+        var(--bg);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      padding: 24px;
     }
-    .card{
-      width:100%; max-width:440px; background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-      border:1px solid rgba(148,163,184,.18); border-radius:20px; padding:28px;
-      box-shadow:0 20px 60px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.05);
-      backdrop-filter: blur(10px);
+
+    /* ── カード ── */
+    .card {
+      width: 100%; max-width: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px 28px;
+      box-shadow: 0 24px 64px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.05);
+      backdrop-filter: blur(12px);
     }
-    h1{font-size:1.35rem; margin:0 0 6px 0; letter-spacing:.02em}
-    .sub{color:var(--muted); font-size:.92rem; margin-bottom:20px}
-    .field{position:relative; margin:16px 0 22px}
-    .input{
-      width:100%; padding:16px 44px 14px 44px; border-radius:14px; outline:0;
-      border:1px solid rgba(148,163,184,.25); background:rgba(2,6,23,.6); color:var(--text);
-      transition:.2s border-color, .2s box-shadow, .2s background;
-      font-size:15px;
+
+    /* ── ロゴ／タイトル ── */
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 6px;
     }
-    .input::placeholder{color:transparent}
-    .label{
-      position:absolute; left:44px; top:14px; font-size:14px; color:var(--muted); pointer-events:none;
-      transition:.18s transform, .18s color, .18s font-size;
-      transform-origin:left top;
+    .logo-icon {
+      width: 40px; height: 40px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+      display: grid; place-items: center;
+      font-size: 1.3rem;
+      box-shadow: 0 6px 16px rgba(59,130,246,.35);
     }
-    .input:focus{ border-color:var(--primary); box-shadow:0 0 0 6px var(--ring), 0 10px 30px rgba(59,130,246,.15); background:rgba(2,6,23,.75); }
+    h1 { font-size: 1.25rem; margin: 0; letter-spacing: .02em; }
+    .sub { color: var(--muted); font-size: .88rem; margin: 4px 0 24px 50px; }
+
+    /* ── フォームフィールド ── */
+    .field { position: relative; margin-bottom: 20px; }
+    .input {
+      width: 100%; padding: 15px 44px 13px;
+      border-radius: 14px; outline: 0;
+      border: 1px solid var(--border);
+      background: rgba(2,6,23,.6);
+      color: var(--text);
+      font-size: 15px; font-family: inherit;
+      transition: .2s border-color, .2s box-shadow, .2s background;
+    }
+    .input::placeholder { color: transparent; }
+    .input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 6px var(--ring), 0 10px 30px rgba(59,130,246,.15);
+      background: rgba(2,6,23,.75);
+    }
+    .label {
+      position: absolute; left: 44px; top: 14px;
+      font-size: 14px; color: var(--muted); pointer-events: none;
+      transition: .18s transform, .18s color, .18s font-size;
+      transform-origin: left top;
+    }
     .input:focus + .label,
-    .input:not(:placeholder-shown) + .label{
-      transform:translateY(-26px) scale(.9); color:var(--primary);
+    .input:not(:placeholder-shown) + .label {
+      transform: translateY(-26px) scale(.85);
+      color: var(--primary);
     }
-    .icon{
-      position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--muted); font-size:18px;
-      width:20px; height:20px; display:grid; place-items:center;
+    .icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      color: var(--muted); width: 20px; height: 20px;
+      display: grid; place-items: center; font-size: 17px;
     }
-    .checkbox-wrapper{
-      display:flex; align-items:center; gap:8px; margin:12px 0 16px;
+
+    /* ── チェックボックス ── */
+    .checkbox-row {
+      display: flex; align-items: center; gap: 8px;
+      margin: -4px 0 20px;
     }
-    .checkbox-wrapper input[type="checkbox"]{
-      width:18px; height:18px; cursor:pointer; accent-color:var(--primary);
+    .checkbox-row input[type="checkbox"] {
+      width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer;
     }
-    .checkbox-wrapper label{
-      color:var(--text); font-size:.92rem; cursor:pointer; user-select:none;
+    .checkbox-row label { font-size: .86rem; color: var(--muted); cursor: pointer; }
+
+    /* ── ボタン群 ── */
+    .btn-row { display: flex; gap: 10px; }
+    .btn {
+      flex: 1; padding: 13px 14px; border-radius: 12px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--primary), var(--primary-strong));
+      color: white; cursor: pointer; font-weight: 600;
+      font-size: .93rem; font-family: inherit;
+      letter-spacing: .02em;
+      box-shadow: 0 10px 28px rgba(59,130,246,.3);
+      transition: .2s filter, .2s transform, .2s box-shadow;
     }
-    .actions{display:flex; gap:12px; align-items:center; margin-top:6px}
-    .btn{
-      flex:1; padding:12px 14px; border-radius:12px; border:1px solid rgba(148,163,184,.22);
-      background:linear-gradient(180deg, var(--primary), var(--primary-strong)); color:white; cursor:pointer;
-      font-weight:600; letter-spacing:.02em; box-shadow:0 12px 30px rgba(59,130,246,.3);
-      transition:.2s transform, .2s box-shadow, .2s filter;
+    .btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    .btn.secondary {
+      background: transparent; color: var(--text);
+      border-color: var(--border); box-shadow: none;
     }
-    .btn:hover{ transform: translateY(-1px); filter:saturate(1.05); }
-    .btn.secondary{
-      flex:1; background:transparent; color:var(--text); border-color:rgba(148,163,184,.32);
-      box-shadow:none; padding:12px 14px;
-    }
-    .btn.secondary:hover{ box-shadow:0 10px 26px rgba(148,163,184,.15); }
-    .link{color:var(--primary); text-decoration:none; font-size:.9rem}
-    .row-between{display:flex; justify-content:space-between; align-items:center; margin-top:8px}
-    .msg{min-height:22px; margin-top:14px; font-size:.92rem}
-    .msg.error{color:var(--danger)} .msg.ok{color:var(--ok)}
-    .stack{ display:block; margin-top:10px }
-    @media (max-width:480px){ .card{padding:22px} }
+    .btn.secondary:hover { background: rgba(255,255,255,.05); box-shadow: 0 6px 18px rgba(0,0,0,.2); }
+    .btn-full { width: 100%; margin-top: 10px; }
+
+    .divider { height: 1px; background: var(--border); margin: 22px 0; }
+
+    /* ── メッセージ ── */
+    .msg { min-height: 20px; margin-top: 16px; font-size: .88rem; }
+    .msg.error { color: var(--danger); }
+    .msg.ok { color: var(--ok); }
+
+    @media (max-width: 480px) { .card { padding: 24px 18px; } }
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>並び替えツール ログイン</h1>
-    <div class="sub">メールとパスワードを入力してください</div>
+    <div class="logo">
+      <div class="logo-icon">🖼️</div>
+      <h1>画像並び替えツール</h1>
+    </div>
+    <div class="sub">メールアドレスとパスワードでログイン</div>
+
     <form id="loginForm" autocomplete="on">
       <div class="field">
         <span class="icon">📧</span>
-        <input id="email" class="input" type="email" inputmode="email" autocomplete="email" placeholder=" " required>
+        <input id="email" class="input" type="email" inputmode="email"
+               autocomplete="email" placeholder=" " required>
         <label class="label" for="email">メールアドレス</label>
       </div>
       <div class="field">
         <span class="icon">🔒</span>
-        <input id="password" class="input" type="password" autocomplete="current-password" placeholder=" " required>
+        <input id="password" class="input" type="password"
+               autocomplete="current-password" placeholder=" " required>
         <label class="label" for="password">パスワード</label>
       </div>
 
-      <!-- ログイン情報を記憶するチェックボックス -->
-      <div class="checkbox-wrapper">
-        <input type="checkbox" id="rememberMe">
-        <label for="rememberMe">ログイン情報を記憶する</label>
+      <!-- A-2: メールアドレスのみ記憶（パスワードは保存しない） -->
+      <div class="checkbox-row">
+        <input type="checkbox" id="rememberEmail">
+        <label for="rememberEmail">メールアドレスを記憶する</label>
       </div>
 
-      <!-- 上段: ログイン + パスワード変更 -->
-      <div class="actions">
+      <div class="btn-row">
         <button type="submit" class="btn">ログイン</button>
-        <button id="changePwBtn" type="button" class="btn secondary" title="現在のパスワードで認証後、新しいパスワードに更新します">パスワード変更</button>
+        <button id="changePwBtn" type="button" class="btn secondary">パスワード変更</button>
       </div>
+      <button id="resetBtn" type="button" class="btn secondary btn-full">
+        パスワードを忘れた
+      </button>
 
-      <!-- 下段: パスワードを忘れた（リセットメール送信） -->
-      <div class="stack">
-        <button id="resetBtn" type="button" class="btn secondary" style="width:100%" title="メールにパスワード再設定リンクを送ります">パスワードを忘れた</button>
-      </div>
-
-      <div class="row-between" style="margin-top:8px">
-        <a id="toTool" class="link" href="#" style="visibility:hidden"></a>
-        <a id="help" class="link" href="#" onclick="alert('メールを入力して「パスワードを忘れた」を押すと、再設定メールが届きます。');return false;"></a>
-      </div>
-
+      <div class="divider"></div>
       <div id="message" class="msg"></div>
     </form>
   </div>
 
-  <!-- Firebase SDK（compat） -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script>
-    // Firebase初期化と認証永続化の設定
     const firebaseConfig = {
       apiKey: "AIzaSyD9D6IE-FdCYOKqVzPpl7E8qK7njnBxqfQ",
       authDomain: "image-sorter-5a77d.firebaseapp.com",
@@ -139,146 +196,124 @@
     };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{});
+    // Firebase自身のLOCAL永続化で「ログイン維持」を実現（パスワード保存不要）
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
 
-    // DOM参照
-    const $ = (s)=>document.querySelector(s);
+    const $ = s => document.querySelector(s);
     const msg = $('#message');
     const emailInput = $('#email');
     const passwordInput = $('#password');
-    const rememberCheckbox = $('#rememberMe');
+    const rememberChk = $('#rememberEmail');
 
-    // ページロード時：保存されたログイン情報を復元
-    window.addEventListener('load', ()=>{
-      const savedEmail = localStorage.getItem('loginEmail');
-      const savedPassword = localStorage.getItem('loginPassword');
-      const rememberMe = localStorage.getItem('rememberMe');
-      
-      if(rememberMe === 'true' && savedEmail){
-        emailInput.value = savedEmail;
-        if(savedPassword){
-          passwordInput.value = savedPassword;
-        }
-        rememberCheckbox.checked = true;
+    // A-2: ページ読み込み時はメールアドレスのみ復元
+    window.addEventListener('load', () => {
+      const saved = localStorage.getItem('savedEmail');
+      if (saved) {
+        emailInput.value = saved;
+        rememberChk.checked = true;
       }
     });
 
-    // 通常ログイン
-    $('#loginForm').addEventListener('submit', async (e)=>{
+    // ログイン
+    $('#loginForm').addEventListener('submit', async e => {
       e.preventDefault();
       msg.textContent = '';
-      
       const email = emailInput.value.trim();
       const password = passwordInput.value;
-      
-      // ログイン情報の保存または削除
-      if(rememberCheckbox.checked){
-        localStorage.setItem('loginEmail', email);
-        localStorage.setItem('loginPassword', password);
-        localStorage.setItem('rememberMe', 'true');
-      }else{
-        localStorage.removeItem('loginEmail');
-        localStorage.removeItem('loginPassword');
-        localStorage.setItem('rememberMe', 'false');
+
+      // A-2: メールアドレスのみ保存（パスワードは一切保存しない）
+      if (rememberChk.checked) {
+        localStorage.setItem('savedEmail', email);
+      } else {
+        localStorage.removeItem('savedEmail');
       }
-      
-      try{
+
+      try {
         await auth.signInWithEmailAndPassword(email, password);
-        msg.textContent = 'ログインに成功しました。ツールへ移動します。';
+        msg.textContent = 'ログイン成功。ツールへ移動します…';
         msg.className = 'msg ok';
         location.href = 'tool.html';
-      }catch(err){
-        msg.textContent = 'ログイン失敗: ' + err.message;
+      } catch (err) {
+        msg.textContent = 'ログインできませんでした。メールまたはパスワードを確認してください。';
         msg.className = 'msg error';
       }
     });
 
     // パスワードを忘れた
-    $('#resetBtn').addEventListener('click', async ()=>{
+    $('#resetBtn').addEventListener('click', async () => {
       msg.textContent = '';
       const email = emailInput.value.trim();
-      if(!email){
-        msg.textContent = '先にメールアドレスを入力してください。';
+      if (!email) {
+        msg.textContent = 'まずメールアドレスを入力してください。';
         msg.className = 'msg error';
         emailInput.focus();
         return;
       }
-      try{
+      try {
         await auth.sendPasswordResetEmail(email);
-        msg.textContent = '再設定用のメールを送信しました。メールを確認してください。';
+        msg.textContent = '再設定メールを送信しました。受信ボックスを確認してください。';
         msg.className = 'msg ok';
-      }catch(err){
-        msg.textContent = '送信できませんでした: ' + err.message;
+      } catch (err) {
+        msg.textContent = '送信に失敗しました。メールアドレスを確認してください。';
         msg.className = 'msg error';
       }
     });
 
     // パスワード変更
-    $('#changePwBtn').addEventListener('click', async ()=>{
+    $('#changePwBtn').addEventListener('click', async () => {
       msg.textContent = '';
-
       const inputEmail = emailInput.value.trim();
       const currentPw = passwordInput.value;
 
-      if(!inputEmail && !auth.currentUser){
-        msg.textContent = '先にメールアドレスを入力してください。';
+      if (!inputEmail && !auth.currentUser) {
+        msg.textContent = 'メールアドレスを入力してください。';
         msg.className = 'msg error';
         emailInput.focus();
         return;
       }
-      if(!currentPw){
-        msg.textContent = '先に現在のパスワードを入力してください。';
+      if (!currentPw) {
+        msg.textContent = '現在のパスワードを入力してください。';
         msg.className = 'msg error';
         passwordInput.focus();
         return;
       }
 
-      const newPw = prompt('新しいパスワードを入力してください（6文字以上推奨）:');
-      if(newPw === null) return;
-      if(newPw.length < 6){
-        msg.textContent = '新しいパスワードは6文字以上にしてください。';
+      const newPw = prompt('新しいパスワードを入力してください（8文字以上推奨）:');
+      if (newPw === null) return;
+      if (newPw.length < 6) {
+        msg.textContent = 'パスワードは6文字以上にしてください。';
         msg.className = 'msg error';
         return;
       }
       const newPw2 = prompt('新しいパスワード（確認）を再入力してください:');
-      if(newPw2 === null) return;
-      if(newPw !== newPw2){
+      if (newPw2 === null) return;
+      if (newPw !== newPw2) {
         msg.textContent = '新しいパスワードが一致しません。';
         msg.className = 'msg error';
         return;
       }
 
-      try{
-        if(!auth.currentUser){
+      try {
+        if (!auth.currentUser) {
           await auth.signInWithEmailAndPassword(inputEmail, currentPw);
-        }else{
+        } else {
           const emailForReauth = inputEmail || auth.currentUser.email;
           const cred = firebase.auth.EmailAuthProvider.credential(emailForReauth, currentPw);
           await auth.currentUser.reauthenticateWithCredential(cred);
         }
-
         await auth.currentUser.updatePassword(newPw);
-
-        msg.textContent = 'パスワードを変更しました。次回以降は新しいパスワードを現在パスワードとして入力してください。';
+        msg.textContent = 'パスワードを変更しました。';
         msg.className = 'msg ok';
-
-        // 記憶機能が有効な場合、新しいパスワードで更新
-        passwordInput.value = newPw;
-        if(rememberCheckbox.checked){
-          localStorage.setItem('loginPassword', newPw);
-        }
-      }catch(err){
-        msg.textContent = 'パスワード変更に失敗しました: ' + err.message;
+        passwordInput.value = '';
+      } catch (err) {
+        msg.textContent = 'パスワード変更に失敗しました。現在のパスワードを確認してください。';
         msg.className = 'msg error';
       }
     });
 
-    // ログイン済なら「ツールへ」を可視化
-    auth.onAuthStateChanged((user)=>{
-      if(user){
-        $('#toTool').style.visibility = 'visible';
-        $('#toTool').href = 'tool.html';
-      }
+    // ログイン済みなら直接ツールへ
+    auth.onAuthStateChanged(user => {
+      if (user) location.href = 'tool.html';
     });
   </script>
 </body>
