@@ -341,7 +341,13 @@
       auth.onAuthStateChanged(async user => {
         if (!user) { location.href = 'index.html'; return; }
         const ok = await canEnterTool(user);
-        if (!ok) { alert('このアカウントは別の端末で使用中です。'); location.href = 'index.html'; return; }
+        if (!ok) {
+          alert('このアカウントは別の端末で使用中です。');
+          // サインアウトしてからリダイレクト（サインアウトしないとindex.htmlが即座にtool.htmlへ戻してループになる）
+          await auth.signOut();
+          location.href = 'index.html';
+          return;
+        }
 
         const el = document.getElementById('userEmail');
         if (el) el.textContent = user.email;
