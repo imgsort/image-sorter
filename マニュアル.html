@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>画像並び替えツール 操作手順書</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary:#3b82f6; --primary-light:#eff6ff;
+      --ok:#10b981; --ok-light:#ecfdf5;
+      --warning:#f59e0b; --warning-light:#fffbeb;
+      --danger:#ef4444; --danger-light:#fef2f2;
+      --gray-50:#f9fafb; --gray-100:#f3f4f6; --gray-200:#e5e7eb;
+      --gray-400:#9ca3af; --gray-600:#4b5563; --gray-700:#374151; --gray-900:#111827;
+      /* UI mock colors */
+      --ui-bg:#0f172a; --ui-card:#1e293b; --ui-border:rgba(148,163,184,.18);
+      --ui-muted:#94a3b8; --ui-text:#e2e8f0;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans JP',sans-serif;background:var(--gray-100);color:var(--gray-700);line-height:1.7;font-size:15px;}
+
+    /* ── 表紙 ── */
+    .cover{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 60%,#0f172a 100%);color:white;text-align:center;padding:64px 24px 56px;}
+    .cover-icon{width:80px;height:80px;border-radius:24px;background:linear-gradient(135deg,#60a5fa,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:2.4rem;margin:0 auto 24px;box-shadow:0 12px 36px rgba(59,130,246,.45);}
+    .cover h1{font-size:2rem;font-weight:700;letter-spacing:.03em;margin-bottom:8px;}
+    .cover .subtitle{font-size:1rem;opacity:.65;}
+    .cover .updated{margin-top:16px;font-size:.85rem;opacity:.5;}
+
+    /* ── 目次 ── */
+    .toc{background:white;max-width:820px;margin:32px auto 0;border-radius:16px;padding:28px 32px;box-shadow:0 2px 12px rgba(0,0,0,.07);}
+    .toc h2{font-size:1rem;font-weight:700;color:var(--gray-900);margin-bottom:16px;}
+    .toc ol{padding-left:20px;}
+    .toc li{margin:8px 0;}
+    .toc a{color:var(--primary);text-decoration:none;font-size:.92rem;}
+    .toc a:hover{text-decoration:underline;}
+
+    /* ── コンテンツ ── */
+    .content{max-width:820px;margin:0 auto;padding:0 16px 64px;}
+
+    .section{background:white;border-radius:16px;padding:32px;margin-top:24px;box-shadow:0 2px 12px rgba(0,0,0,.07);}
+    .section-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid var(--gray-100);}
+    .section-num{width:40px;height:40px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,var(--primary),#2563eb);color:white;font-size:1.1rem;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(59,130,246,.3);}
+    .section-title{font-size:1.15rem;font-weight:700;color:var(--gray-900);}
+    .section-sub{font-size:.82rem;color:var(--gray-400);margin-top:2px;}
+
+    .steps{display:flex;flex-direction:column;gap:16px;}
+    .step{display:flex;gap:14px;align-items:flex-start;}
+    .step-num{width:28px;height:28px;border-radius:50%;flex-shrink:0;background:var(--primary-light);color:var(--primary);font-size:.82rem;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px;}
+    .step-body{flex:1;}
+    .step-body strong{color:var(--gray-900);}
+
+    .note{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:10px;margin-top:12px;font-size:.88rem;}
+    .note.info{background:var(--primary-light);color:#1d4ed8;}
+    .note.ok{background:var(--ok-light);color:#065f46;}
+    .note.warn{background:var(--warning-light);color:#92400e;}
+    .note.danger{background:var(--danger-light);color:#991b1b;}
+    .note-icon{font-size:1rem;flex-shrink:0;margin-top:1px;}
+
+    .kbd-table{width:100%;border-collapse:collapse;margin-top:8px;}
+    .kbd-table th{background:var(--gray-50);color:var(--gray-600);font-size:.8rem;font-weight:600;letter-spacing:.05em;padding:10px 14px;text-align:left;border-bottom:1px solid var(--gray-200);}
+    .kbd-table td{padding:11px 14px;font-size:.88rem;border-bottom:1px solid var(--gray-100);vertical-align:middle;}
+    .kbd-table tr:last-child td{border-bottom:none;}
+
+    kbd{display:inline-flex;align-items:center;background:var(--gray-100);border:1px solid var(--gray-200);border-radius:6px;padding:2px 8px;font-family:inherit;font-size:.82rem;font-weight:600;color:var(--gray-700);white-space:nowrap;box-shadow:0 1px 0 var(--gray-300);}
+
+    .btn-sample{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:8px;font-size:.82rem;font-weight:600;vertical-align:middle;}
+    .btn-sample.primary{background:#3b82f6;color:white;}
+    .btn-sample.ok{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;}
+    .btn-sample.danger{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;}
+    .btn-sample.gray{background:var(--gray-100);color:var(--gray-700);border:1px solid var(--gray-200);}
+
+    .label{display:inline-block;padding:2px 8px;border-radius:6px;font-size:.78rem;font-weight:600;vertical-align:middle;}
+    .label.new{background:#fef3c7;color:#92400e;}
+
+    hr.light{border:none;border-top:1px solid var(--gray-100);margin:20px 0;}
+
+    .checklist{list-style:none;padding:0;}
+    .checklist li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--gray-100);font-size:.9rem;}
+    .checklist li:last-child{border-bottom:none;}
+    .checklist .check{color:var(--ok);font-size:1rem;flex-shrink:0;}
+
+    .flow{display:flex;flex-direction:column;gap:4px;background:var(--gray-50);border-radius:12px;padding:18px;}
+    .flow-item{display:flex;align-items:center;gap:10px;background:white;border-radius:8px;padding:10px 14px;border:1px solid var(--gray-200);font-size:.88rem;}
+    .flow-arrow{text-align:center;color:var(--gray-400);font-size:.9rem;padding-left:20px;}
+
+    /* ── UI モックアップ共通 ── */
+    .ui-mock{border-radius:12px;overflow:hidden;margin:18px 0;box-shadow:0 4px 20px rgba(0,0,0,.18);border:1px solid rgba(0,0,0,.12);font-family:Inter,sans-serif;user-select:none;}
+    .ui-mock-label{font-size:.75rem;font-weight:600;color:var(--gray-400);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;}
+
+    /* ログイン画面モック */
+    .mock-login{background:linear-gradient(135deg,rgba(96,165,250,.18) 0%,transparent 55%),linear-gradient(225deg,rgba(16,185,129,.15) 0%,transparent 55%),#0f172a;padding:32px 24px;display:flex;justify-content:center;}
+    .mock-card{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid rgba(148,163,184,.2);border-radius:16px;padding:24px;width:100%;max-width:340px;box-shadow:0 16px 48px rgba(0,0,0,.4);}
+    .mock-logo-row{display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+    .mock-logo-icon{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#60a5fa,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 4px 10px rgba(59,130,246,.35);}
+    .mock-title{font-size:1rem;font-weight:700;color:#e2e8f0;}
+    .mock-sub{font-size:.78rem;color:#94a3b8;margin-bottom:18px;padding-left:42px;}
+    .mock-field{background:rgba(2,6,23,.6);border:1px solid rgba(148,163,184,.22);border-radius:11px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+    .mock-field-icon{font-size:.9rem;opacity:.6;}
+    .mock-field-text{font-size:.85rem;color:#94a3b8;}
+    .mock-chk-row{display:flex;align-items:center;gap:7px;margin-bottom:16px;}
+    .mock-chk{width:14px;height:14px;border:1px solid rgba(148,163,184,.3);border-radius:3px;background:rgba(2,6,23,.6);}
+    .mock-chk-label{font-size:.78rem;color:#94a3b8;}
+    .mock-btn-row{display:flex;gap:8px;margin-bottom:8px;}
+    .mock-btn{flex:1;padding:10px;border-radius:10px;text-align:center;font-size:.82rem;font-weight:600;}
+    .mock-btn.prim{background:linear-gradient(180deg,#60a5fa,#3b82f6);color:white;box-shadow:0 6px 16px rgba(59,130,246,.28);}
+    .mock-btn.sec{background:transparent;color:#e2e8f0;border:1px solid rgba(148,163,184,.25);}
+    .mock-btn.full{text-align:center;width:100%;margin-top:0;}
+
+    /* ツールバーモック */
+    .mock-header{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border-bottom:1px solid rgba(148,163,184,.15);padding:10px 16px;display:flex;align-items:center;gap:10px;}
+    .mock-header-logo{display:flex;align-items:center;gap:8px;font-size:.9rem;font-weight:600;color:#e2e8f0;}
+    .mock-logo-sm{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#60a5fa,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:.85rem;}
+    .mock-spacer{flex:1;}
+    .mock-user{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,184,.15);border-radius:16px;padding:4px 10px 4px 6px;font-size:.72rem;color:#94a3b8;}
+    .mock-avatar{width:18px;height:18px;border-radius:50%;background:rgba(96,165,250,.15);border:1px solid #60a5fa;display:flex;align-items:center;justify-content:center;font-size:.6rem;}
+    .mock-toolbar{background:rgba(15,23,42,.9);border-bottom:1px solid rgba(148,163,184,.15);padding:8px 16px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+    .mock-tbtn{display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.15);background:rgba(255,255,255,.04);color:#e2e8f0;font-size:.72rem;font-weight:500;white-space:nowrap;}
+    .mock-tbtn.prim{background:linear-gradient(180deg,#60a5fa,#3b82f6);border-color:transparent;color:white;box-shadow:0 4px 12px rgba(59,130,246,.25);}
+    .mock-tbtn.ok{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.3);color:#10b981;}
+    .mock-tbtn.danger{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.3);color:#ef4444;}
+    .mock-tbtn.dim{opacity:.35;}
+    .mock-sep{width:1px;height:20px;background:rgba(148,163,184,.15);margin:0 2px;}
+    .mock-slider-grp{display:flex;align-items:center;gap:5px;font-size:.7rem;color:#94a3b8;}
+    .mock-slider{width:70px;height:3px;background:linear-gradient(90deg,#3b82f6 60%,rgba(148,163,184,.3) 60%);border-radius:2px;}
+
+    /* ドロップゾーンモック */
+    .mock-dropzone-wrap{background:#0f172a;padding:16px;}
+    .mock-statusbar{padding:6px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(148,163,184,.15);font-size:.7rem;color:#94a3b8;margin-bottom:12px;}
+    .mock-badge{display:inline-flex;align-items:center;gap:3px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,184,.15);border-radius:5px;padding:1px 6px;}
+    .mock-dz{border:2px dashed rgba(148,163,184,.2);border-radius:14px;background:rgba(255,255,255,.03);padding:36px 24px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;}
+    .mock-dz-icon{font-size:2.4rem;opacity:.5;}
+    .mock-dz-title{font-size:.95rem;font-weight:600;color:#e2e8f0;}
+    .mock-dz-sub{font-size:.72rem;color:#94a3b8;line-height:1.6;}
+    .mock-dz-btn{padding:9px 22px;border-radius:10px;background:linear-gradient(180deg,#60a5fa,#3b82f6);color:white;font-size:.8rem;font-weight:600;box-shadow:0 6px 16px rgba(59,130,246,.28);}
+
+    /* ギャラリーモック */
+    .mock-gallery-wrap{background:#0f172a;padding:12px 16px 16px;}
+    .mock-statusbar2{padding:5px 0;display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:.7rem;color:#94a3b8;}
+    .mock-badge.sel{background:rgba(249,115,22,.15);border-color:rgba(249,115,22,.3);color:#f97316;}
+    .mock-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+    .mock-card{background:#1e293b;border:1px solid rgba(148,163,184,.15);border-radius:10px;overflow:hidden;}
+    .mock-card.selected{border-color:#f97316;box-shadow:0 0 0 2px rgba(249,115,22,.25);}
+    .mock-img{height:80px;background:#060d1a;display:flex;align-items:center;justify-content:center;font-size:1.8rem;opacity:.55;position:relative;}
+    .mock-num{position:absolute;top:5px;left:5px;background:rgba(0,0,0,.65);color:white;font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:10px;}
+    .mock-sel-badge{position:absolute;top:5px;right:5px;background:#f97316;color:white;font-size:.58rem;font-weight:700;padding:1px 6px;border-radius:10px;}
+    .mock-card-foot{padding:5px 7px;border-top:1px solid rgba(148,163,184,.1);font-size:.62rem;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+    /* 選択状態モック */
+    .mock-select-demo{background:#0f172a;padding:12px 16px;}
+    .mock-select-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+
+    /* UndoRedo モック */
+    .mock-undo-area{background:#0f172a;padding:12px 16px;}
+    .mock-undo-toolbar{background:rgba(15,23,42,.9);border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:8px;}
+
+    @media print {
+      body{background:white;}
+      .toc,.section{box-shadow:none;border:1px solid var(--gray-200);}
+      .cover{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+      .section{page-break-inside:avoid;}
+      .ui-mock{page-break-inside:avoid;}
+    }
+    @media(max-width:600px){
+      .cover h1{font-size:1.5rem;}
+      .section{padding:20px;}
+      .toc{padding:20px;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- 表紙 -->
+<div class="cover">
+  <div class="cover-icon">🖼️</div>
+  <h1>画像並び替えツール</h1>
+  <div class="subtitle">操作手順書</div>
+  <div class="updated">2026年4月版</div>
+</div>
+
+<div class="content">
+
+  <!-- 目次 -->
+  <div class="toc">
+    <h2>📋 もくじ</h2>
+    <ol>
+      <li><a href="#sec1">ログイン方法</a></li>
+      <li><a href="#sec2">画像の追加方法</a></li>
+      <li><a href="#sec3">画像の表示サイズを変える</a></li>
+      <li><a href="#sec4">画像を選択する</a></li>
+      <li><a href="#sec5">画像を並び替える（ドラッグ&ドロップ）</a></li>
+      <li><a href="#sec6">操作を元に戻す・やり直す（新機能）</a></li>
+      <li><a href="#sec7">画像を削除する</a></li>
+      <li><a href="#sec8">並び替えた画像を保存する（ZIP）</a></li>
+      <li><a href="#sec9">全てリセットする</a></li>
+      <li><a href="#sec10">ログアウト</a></li>
+      <li><a href="#sec11">キーボードショートカット一覧</a></li>
+      <li><a href="#sec12">よくある質問・トラブル</a></li>
+    </ol>
+  </div>
+
+  <!-- 1. ログイン -->
+  <div class="section" id="sec1">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div>
+        <div class="section-title">ログイン方法</div>
+        <div class="section-sub">ツールを使い始める前に認証が必要です</div>
+      </div>
+    </div>
+
+    <!-- ログイン画面モック -->
+    <div class="ui-mock-label">▼ ログイン画面</div>
+    <div class="ui-mock">
+      <div class="mock-login">
+        <div class="mock-card">
+          <div class="mock-logo-row">
+            <div class="mock-logo-icon">🖼️</div>
+            <div class="mock-title">画像並び替えツール</div>
+          </div>
+          <div class="mock-sub">メールアドレスとパスワードでログイン</div>
+          <div class="mock-field"><span class="mock-field-icon">📧</span><span class="mock-field-text">メールアドレス</span></div>
+          <div class="mock-field"><span class="mock-field-icon">🔒</span><span class="mock-field-text">パスワード</span></div>
+          <div class="mock-chk-row">
+            <div class="mock-chk"></div>
+            <span class="mock-chk-label">メールアドレスを記憶する</span>
+          </div>
+          <div class="mock-btn-row">
+            <div class="mock-btn prim">ログイン</div>
+            <div class="mock-btn sec">パスワード変更</div>
+          </div>
+          <div class="mock-btn sec full" style="padding:9px;text-align:center;font-size:.82rem;margin-top:8px;border-radius:10px;border:1px solid rgba(148,163,184,.25);color:#e2e8f0;">パスワードを忘れた</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="steps" style="margin-top:16px;">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">ツールのURLをブラウザで開くと、上のログイン画面が表示されます。</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body"><strong>メールアドレス</strong>と<strong>パスワード</strong>を入力してください。<br><span style="font-size:.85rem;color:var(--gray-400);">※メールアドレスとパスワードは運営から別途お知らせします。</span></div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">「<strong>ログイン</strong>」ボタンを押すと、ツール画面に移動します。</div>
+      </div>
+    </div>
+
+    <div class="note info" style="margin-top:16px;">
+      <span class="note-icon">💡</span>
+      <span>「<strong>メールアドレスを記憶する</strong>」にチェックを入れると、次回からメールアドレスの入力が省略できます。</span>
+    </div>
+
+    <hr class="light">
+    <div style="font-size:.9rem;font-weight:600;color:var(--gray-700);margin-bottom:10px;">パスワードを忘れた場合</div>
+    <div class="flow">
+      <div class="flow-item">① ログイン画面でメールアドレスを入力</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-item">②「パスワードを忘れた」ボタンを押す</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-item">③ 入力したメールに再設定メールが届く</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-item">④ メール内のリンクをクリックして新しいパスワードを設定</div>
+    </div>
+    <div class="note warn" style="margin-top:10px;">
+      <span class="note-icon">⚠️</span>
+      <span>再設定メールのリンクは届いたらすぐにクリックしてください。<strong>時間が経つと無効</strong>になります。</span>
+    </div>
+  </div>
+
+  <!-- 2. 画像の追加 -->
+  <div class="section" id="sec2">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div>
+        <div class="section-title">画像の追加方法</div>
+        <div class="section-sub">2通りの方法で画像を読み込めます</div>
+      </div>
+    </div>
+
+    <!-- ドロップゾーンモック -->
+    <div class="ui-mock-label">▼ ツール画面（画像追加前の状態）</div>
+    <div class="ui-mock">
+      <div class="mock-header">
+        <div class="mock-header-logo"><div class="mock-logo-sm">🖼️</div>画像並び替えツール</div>
+        <div class="mock-spacer"></div>
+        <div class="mock-user"><div class="mock-avatar">👤</div><span>example@gmail.com</span></div>
+      </div>
+      <div class="mock-toolbar">
+        <div class="mock-tbtn prim">＋ 画像を追加</div>
+        <div class="mock-sep"></div>
+        <div class="mock-tbtn dim">↩ 元に戻す</div>
+        <div class="mock-tbtn dim">↪ やり直す</div>
+      </div>
+      <div class="mock-dropzone-wrap">
+        <div class="mock-dz">
+          <div class="mock-dz-icon">🖼️</div>
+          <div class="mock-dz-title">画像をここにドロップ</div>
+          <div class="mock-dz-sub">JPG・PNG・GIF・WEBP など複数ファイルに対応<br>ドラッグ&ドロップまたはボタンでファイルを選択</div>
+          <div class="mock-dz-btn">📁 ファイルを選択して追加</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;font-weight:600;color:var(--gray-900);margin-bottom:10px;">方法A：ボタンで追加</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">ツールバーの <span class="btn-sample primary">＋ 画像を追加</span> ボタンを押す</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">ファイル選択ダイアログが開くので、追加したい画像を選んで「開く」を押す<br><span style="font-size:.85rem;color:var(--gray-400);">※ Ctrl+クリックで複数ファイルをまとめて選択できます</span></div>
+      </div>
+    </div>
+
+    <hr class="light">
+    <div style="font-weight:600;color:var(--gray-900);margin-bottom:10px;">方法B：ドラッグ＆ドロップで追加 <span class="label new">新機能</span></div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">エクスプローラー（フォルダ）から画像ファイルを選ぶ</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">ブラウザの中央エリア（「画像をここにドロップ」の部分）にドラッグ＆ドロップする</div>
+      </div>
+    </div>
+    <div class="note ok" style="margin-top:16px;">
+      <span class="note-icon">✅</span>
+      <span>すでに追加済みの画像と<strong>同じファイル名・サイズのファイルは自動でスキップ</strong>されます（重複防止）。</span>
+    </div>
+    <div class="note info" style="margin-top:8px;">
+      <span class="note-icon">📁</span>
+      <span>対応形式：<strong>JPG・PNG・GIF・WEBP</strong> など。1ファイルの上限は<strong>100MB</strong>です。</span>
+    </div>
+  </div>
+
+  <!-- 3. 表示サイズ -->
+  <div class="section" id="sec3">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div>
+        <div class="section-title">画像の表示サイズを変える</div>
+        <div class="section-sub">見やすいサイズに調整できます</div>
+      </div>
+    </div>
+
+    <!-- スライダーモック -->
+    <div class="ui-mock-label">▼ ツールバーのスライダー部分</div>
+    <div class="ui-mock">
+      <div class="mock-toolbar" style="background:#0f172a;padding:12px 20px;">
+        <div class="mock-slider-grp">
+          <span>🖼</span>
+          <div style="display:flex;flex-direction:column;gap:2px;">
+            <div class="mock-slider"></div>
+          </div>
+          <span style="color:#cbd5e1;font-size:.75rem;min-width:44px;">200px</span>
+        </div>
+        <div style="margin-left:16px;font-size:.72rem;color:#94a3b8;">← 小さく表示　　大きく表示 →</div>
+      </div>
+    </div>
+
+    <div class="steps" style="margin-top:16px;">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">ツールバーの 🖼 スライダーを左右にドラッグする</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body"><strong>右に動かす</strong>と大きく、<strong>左に動かす</strong>と小さくなります。現在のサイズはスライダー右に表示されます。</div>
+      </div>
+    </div>
+    <div class="note info" style="margin-top:12px;">
+      <span class="note-icon">💡</span>
+      <span>大量の画像を並び替えるときは<strong>小さめに設定</strong>すると、一画面に多く表示されて作業しやすくなります。</span>
+    </div>
+  </div>
+
+  <!-- 4. 選択 -->
+  <div class="section" id="sec4">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <div>
+        <div class="section-title">画像を選択する</div>
+        <div class="section-sub">1枚・複数枚・範囲の3種類の選択方法があります</div>
+      </div>
+    </div>
+
+    <!-- 選択状態モック -->
+    <div class="ui-mock-label">▼ 選択状態の画像（オレンジ枠＝選択中）</div>
+    <div class="ui-mock">
+      <div class="mock-gallery-wrap">
+        <div class="mock-statusbar2">
+          <span class="mock-badge">📁 6枚 / 12.4MB</span>
+          <span class="mock-badge sel">✓ 3枚を選択中</span>
+        </div>
+        <div class="mock-select-grid">
+          <div class="mock-card"><div class="mock-img" style="position:relative;">🏔️<span class="mock-num">1</span></div><div class="mock-card-foot">photo_001.jpg 2.1MB</div></div>
+          <div class="mock-card selected"><div class="mock-img" style="position:relative;">🌅<span class="mock-num">2</span><span class="mock-sel-badge">✓ 選択中</span></div><div class="mock-card-foot">photo_002.jpg 1.8MB</div></div>
+          <div class="mock-card selected"><div class="mock-img" style="position:relative;">🌊<span class="mock-num">3</span><span class="mock-sel-badge">✓ 選択中</span></div><div class="mock-card-foot">photo_003.jpg 2.4MB</div></div>
+          <div class="mock-card"><div class="mock-img" style="position:relative;">🌸<span class="mock-num">4</span></div><div class="mock-card-foot">photo_004.jpg 1.9MB</div></div>
+          <div class="mock-card selected"><div class="mock-img" style="position:relative;">🏙️<span class="mock-num">5</span><span class="mock-sel-badge">✓ 選択中</span></div><div class="mock-card-foot">photo_005.jpg 2.2MB</div></div>
+          <div class="mock-card"><div class="mock-img" style="position:relative;">🌲<span class="mock-num">6</span></div><div class="mock-card-foot">photo_006.jpg 2.0MB</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="steps" style="margin-top:16px;">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body"><strong>1枚選択：</strong>画像をクリックすると<strong>オレンジの枠</strong>がついて選択状態になります。</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body"><strong>複数選択：</strong><kbd>Ctrl</kbd> を押しながらクリックすると、追加で選択できます。</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body"><strong>範囲選択：</strong>最初の画像をクリック後、<kbd>Shift</kbd> を押しながら別の画像をクリックすると、その間を一括選択できます。</div>
+      </div>
+    </div>
+    <div class="note info" style="margin-top:12px;">
+      <span class="note-icon">💡</span>
+      <span>選択中の枚数は画面上部のステータスバーに <strong>「✓ ○枚を選択中」</strong> と表示されます。</span>
+    </div>
+  </div>
+
+  <!-- 5. 並び替え -->
+  <div class="section" id="sec5">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <div>
+        <div class="section-title">画像を並び替える</div>
+        <div class="section-sub">ドラッグ＆ドロップで自由に順番を変えられます</div>
+      </div>
+    </div>
+
+    <!-- 並び替えイメージモック -->
+    <div class="ui-mock-label">▼ ドラッグ中のイメージ（青枠＝ドロップ先）</div>
+    <div class="ui-mock">
+      <div class="mock-gallery-wrap">
+        <div class="mock-select-grid" style="grid-template-columns:repeat(4,1fr);">
+          <div class="mock-card selected" style="opacity:.5;transform:scale(.97);cursor:grabbing;"><div class="mock-img" style="position:relative;">🌅<span class="mock-num">2</span><span class="mock-sel-badge">✓ 選択中</span></div><div class="mock-card-foot">ドラッグ中…</div></div>
+          <div class="mock-card" style="border-color:#60a5fa;box-shadow:0 0 0 2px rgba(96,165,250,.3);"><div class="mock-img" style="position:relative;">🌊<span class="mock-num">3</span></div><div class="mock-card-foot">← ここにドロップ</div></div>
+          <div class="mock-card"><div class="mock-img" style="position:relative;">🌸<span class="mock-num">4</span></div><div class="mock-card-foot">photo_004.jpg</div></div>
+          <div class="mock-card"><div class="mock-img" style="position:relative;">🏙️<span class="mock-num">5</span></div><div class="mock-card-foot">photo_005.jpg</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="steps" style="margin-top:16px;">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">移動させたい画像を<strong>クリックして選択</strong>する（複数選択も可）</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">選択した画像を<strong>ドラッグ</strong>して、移動先の画像の上に重ねる</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body"><strong>青い枠</strong>が表示された位置でマウスを離すと、その位置に移動します</div>
+      </div>
+    </div>
+    <div class="note ok" style="margin-top:12px;">
+      <span class="note-icon">✅</span>
+      <span>複数選択した状態でドラッグすると、<strong>まとめて移動</strong>できます。</span>
+    </div>
+  </div>
+
+  <!-- 6. Undo/Redo -->
+  <div class="section" id="sec6">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <div>
+        <div class="section-title">操作を元に戻す・やり直す <span class="label new">新機能</span></div>
+        <div class="section-sub">並び替えミスもすぐに元に戻せます</div>
+      </div>
+    </div>
+
+    <!-- Undo/Redoモック -->
+    <div class="ui-mock-label">▼ ツールバーの「元に戻す」「やり直す」ボタン</div>
+    <div class="ui-mock">
+      <div class="mock-undo-area">
+        <div class="mock-undo-toolbar">
+          <div class="mock-tbtn prim" style="font-size:.75rem;">＋ 画像を追加</div>
+          <div class="mock-sep"></div>
+          <div class="mock-tbtn" style="font-size:.75rem;background:rgba(96,165,250,.1);border-color:rgba(96,165,250,.3);color:#60a5fa;">↩ 元に戻す</div>
+          <div class="mock-tbtn" style="font-size:.75rem;background:rgba(96,165,250,.1);border-color:rgba(96,165,250,.3);color:#60a5fa;">↪ やり直す</div>
+          <div class="mock-sep"></div>
+          <div style="font-size:.68rem;color:#94a3b8;">← ミスをしてもここで戻せます</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="steps" style="margin-top:16px;">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>元に戻す：</strong>ツールバーの <span class="btn-sample gray">↩ 元に戻す</span> ボタン、または <kbd>Ctrl</kbd>+<kbd>Z</kbd>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>やり直す：</strong>ツールバーの <span class="btn-sample gray">↪ やり直す</span> ボタン、または <kbd>Ctrl</kbd>+<kbd>Y</kbd>
+        </div>
+      </div>
+    </div>
+    <div class="note info" style="margin-top:12px;">
+      <span class="note-icon">💡</span>
+      <span>最大<strong>20ステップ</strong>まで元に戻せます。並び替え・追加・削除がすべて対象です。</span>
+    </div>
+  </div>
+
+  <!-- 7. 削除 -->
+  <div class="section" id="sec7">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <div>
+        <div class="section-title">画像を削除する</div>
+        <div class="section-sub">不要な画像を取り除きます</div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">削除したい画像を選択する（複数選択可）</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">ツールバーの <span class="btn-sample danger">🗑 削除</span> ボタン、または <kbd>Delete</kbd> キーを押す</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">確認ダイアログが表示されるので「OK」を押すと削除されます</div>
+      </div>
+    </div>
+    <div class="note warn" style="margin-top:12px;">
+      <span class="note-icon">⚠️</span>
+      <span>削除後に <kbd>Ctrl</kbd>+<kbd>Z</kbd> を押すと元に戻せます。</span>
+    </div>
+  </div>
+
+  <!-- 8. 保存 -->
+  <div class="section" id="sec8">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <div>
+        <div class="section-title">並び替えた画像を保存する</div>
+        <div class="section-sub">ZIPファイルでダウンロードされます</div>
+      </div>
+    </div>
+
+    <!-- 保存ボタンモック -->
+    <div class="ui-mock-label">▼ 保存ボタン（ツールバー右側）</div>
+    <div class="ui-mock">
+      <div class="mock-undo-area">
+        <div class="mock-undo-toolbar">
+          <div class="mock-tbtn ok" style="font-size:.75rem;">💾 保存 (ZIP)</div>
+          <div class="mock-tbtn danger" style="font-size:.75rem;">🗑 削除</div>
+          <div class="mock-tbtn" style="font-size:.75rem;">🔄 全リセット</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="steps" style="margin-top:16px;">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">並び替えが完了したら <span class="btn-sample ok">💾 保存（ZIP）</span> ボタンを押す</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">進捗バーが表示されます。完了するとZIPファイルが自動でダウンロードされます</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">ZIPを解凍すると、並び替えた順に <strong>1.jpg・2.jpg・3.jpg…</strong> と連番で入っています</div>
+      </div>
+    </div>
+    <hr class="light">
+    <div style="font-weight:600;color:var(--gray-900);margin-bottom:10px;">500枚を超える場合</div>
+    <ul class="checklist">
+      <li><span class="check">📦</span><span>500枚を超えると自動的に<strong>500枚ごとに分割</strong>してZIPがダウンロードされます</span></li>
+      <li><span class="check">✅</span><span>ZIPが複数に分かれても<strong>画像の並び順はそのまま維持</strong>されます</span></li>
+      <li><span class="check">⏱</span><span>500枚のZIP化には<strong>約1分</strong>かかる場合があります</span></li>
+    </ul>
+  </div>
+
+  <!-- 9. リセット -->
+  <div class="section" id="sec9">
+    <div class="section-header">
+      <div class="section-num">9</div>
+      <div>
+        <div class="section-title">全てリセットする</div>
+        <div class="section-sub">読み込んだ画像を全て消去して最初からやり直します</div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">ツールバーの <span class="btn-sample gray">🔄 全リセット</span> ボタンを押す</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">確認ダイアログが表示されるので「OK」を押す</div>
+      </div>
+    </div>
+    <div class="note danger" style="margin-top:12px;">
+      <span class="note-icon">❌</span>
+      <span>全リセット後は<strong>元に戻せません</strong>。保存が必要な場合は先に「保存（ZIP）」を実行してください。</span>
+    </div>
+  </div>
+
+  <!-- 10. ログアウト -->
+  <div class="section" id="sec10">
+    <div class="section-header">
+      <div class="section-num">10</div>
+      <div>
+        <div class="section-title">ログアウト</div>
+        <div class="section-sub">作業終了後はログアウトしてください</div>
+      </div>
+    </div>
+
+    <!-- ログアウトモック -->
+    <div class="ui-mock-label">▼ ヘッダー右上のログアウトボタン</div>
+    <div class="ui-mock">
+      <div class="mock-header">
+        <div class="mock-header-logo"><div class="mock-logo-sm">🖼️</div>画像並び替えツール</div>
+        <div class="mock-spacer"></div>
+        <div class="mock-user"><div class="mock-avatar">👤</div><span>example@gmail.com</span></div>
+        <div class="mock-tbtn" style="font-size:.72rem;margin-left:6px;">🚪 ログアウト</div>
+      </div>
+    </div>
+
+    <div class="steps" style="margin-top:16px;">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">画面右上の <span class="btn-sample gray">🚪 ログアウト</span> ボタンを押す</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">ログイン画面に戻ります</div>
+      </div>
+    </div>
+    <div class="note warn" style="margin-top:12px;">
+      <span class="note-icon">⚠️</span>
+      <span>このツールは<strong>1アカウント1台</strong>での使用を前提としています。別の端末でログインするとブロックされる場合があります。</span>
+    </div>
+  </div>
+
+  <!-- 11. ショートカット -->
+  <div class="section" id="sec11">
+    <div class="section-header">
+      <div class="section-num">11</div>
+      <div>
+        <div class="section-title">キーボードショートカット一覧</div>
+        <div class="section-sub">覚えると作業が格段に速くなります</div>
+      </div>
+    </div>
+    <table class="kbd-table">
+      <thead>
+        <tr><th>操作</th><th>キー</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>画像を1枚選択</td><td>クリック</td></tr>
+        <tr><td>複数選択（追加）</td><td><kbd>Ctrl</kbd> + クリック</td></tr>
+        <tr><td>範囲選択</td><td><kbd>Shift</kbd> + クリック</td></tr>
+        <tr><td>選択画像を削除</td><td><kbd>Delete</kbd></td></tr>
+        <tr><td>元に戻す</td><td><kbd>Ctrl</kbd> + <kbd>Z</kbd></td></tr>
+        <tr><td>やり直す</td><td><kbd>Ctrl</kbd> + <kbd>Y</kbd></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 12. よくある質問 -->
+  <div class="section" id="sec12">
+    <div class="section-header">
+      <div class="section-num">12</div>
+      <div><div class="section-title">よくある質問・トラブル</div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div>
+        <div style="font-weight:600;color:var(--gray-900);margin-bottom:6px;">Q. 「別の端末で使用中です」と表示されてログインできない</div>
+        <div style="font-size:.9rem;">同じアカウントが別の端末またはブラウザでログイン中です。表示されたダイアログで「<strong>この端末で強制ログイン</strong>」を押すと、他の端末のセッションを解除してこの端末でログインできます。<br><span style="color:var(--gray-400);">※ 他の端末は自動的にログアウトされます。</span></div>
+      </div>
+      <hr class="light">
+      <div>
+        <div style="font-weight:600;color:var(--gray-900);margin-bottom:6px;">Q. 保存ボタンを押してもZIPがダウンロードされない</div>
+        <div style="font-size:.9rem;">ブラウザのポップアップブロックが原因の場合があります。アドレスバー右側の通知が出ていたら「許可」を選択してください。</div>
+      </div>
+      <hr class="light">
+      <div>
+        <div style="font-weight:600;color:var(--gray-900);margin-bottom:6px;">Q. 画像を追加したのに表示されない</div>
+        <div style="font-size:.9rem;">同じファイル名・サイズの画像は重複としてスキップされます。また100MBを超えるファイルは対象外です。</div>
+      </div>
+      <hr class="light">
+      <div>
+        <div style="font-weight:600;color:var(--gray-900);margin-bottom:6px;">Q. パスワードリセットのメールリンクを押すとエラーになる</div>
+        <div style="font-size:.9rem;">リセットリンクには有効期限があります。再度「パスワードを忘れた」を押して新しいメールを送り直し、届いたらすぐにクリックしてください。</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;color:var(--gray-400);font-size:.8rem;margin-top:32px;padding-bottom:24px;">
+    画像並び替えツール 操作手順書 — 2026年4月版
+  </div>
+
+</div>
+</body>
+</html>

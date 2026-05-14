@@ -287,6 +287,43 @@
     }
 
     img { pointer-events: none; -webkit-user-drag: none; }
+
+    /* ── 多重ログイン警告モーダル ── */
+    .ml-overlay {
+      display: none; position: fixed; inset: 0; z-index: 2000;
+      background: rgba(0,0,0,.65); backdrop-filter: blur(6px);
+      place-items: center;
+    }
+    .ml-overlay.visible { display: grid; }
+    .ml-card {
+      width: min(420px, calc(100vw - 32px));
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+      border: 1px solid var(--border-bright);
+      border-radius: 20px; padding: 32px 28px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.55);
+      text-align: center;
+    }
+    .ml-icon { font-size: 2.6rem; margin-bottom: 14px; }
+    .ml-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
+    .ml-body { font-size: .88rem; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
+    .ml-actions { display: flex; flex-direction: column; gap: 10px; }
+    .ml-btn-force {
+      padding: 12px; border-radius: 12px; border: none; cursor: pointer;
+      font-family: inherit; font-size: .92rem; font-weight: 600;
+      background: linear-gradient(180deg, var(--primary), var(--primary-strong));
+      color: white; box-shadow: 0 6px 18px rgba(59,130,246,.3);
+      transition: filter .16s;
+    }
+    .ml-btn-force:hover:not(:disabled) { filter: brightness(1.1); }
+    .ml-btn-force:disabled { opacity: .5; cursor: not-allowed; }
+    .ml-btn-logout {
+      padding: 11px; border-radius: 12px; cursor: pointer;
+      font-family: inherit; font-size: .88rem; font-weight: 500;
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--muted); transition: background .16s, border-color .16s;
+    }
+    .ml-btn-logout:hover:not(:disabled) { background: rgba(255,255,255,.07); border-color: var(--border-bright); color: var(--text); }
+    .ml-btn-logout:disabled { opacity: .5; cursor: not-allowed; }
   </style>
 
   <!-- Firebase認証ガード（画面表示前に確認） -->
@@ -314,6 +351,13 @@
         return id;
       }
 
+      async function registerSession(user) {
+        const did = getDeviceId();
+        const col = db.collection('users').doc(user.uid).collection('sessions');
+        await col.doc(did).set({ active: true, deviceId: did, userAgent: navigator.userAgent,
+          lastSeenAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+      }
+
       async function canEnterTool(user) {
         try {
           const did = getDeviceId();
@@ -322,10 +366,49 @@
           let other = false;
           snap.forEach(d => { if (d.data().deviceId !== did) other = true; });
           if (other) return false;
-          await col.doc(did).set({ active: true, deviceId: did, userAgent: navigator.userAgent,
-            lastSeenAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+          await registerSession(user);
           return true;
         } catch (e) { console.error(e); return true; }
+      }
+
+      async function forceLogin(user) {
+        // 他端末のセッションをすべて無効化してからこの端末で入室
+        try {
+          const did = getDeviceId();
+          const col = db.collection('users').doc(user.uid).collection('sessions');
+          const snap = await col.where('active', '==', true).get();
+          const batch = db.batch();
+          snap.forEach(d => {
+            if (d.data().deviceId !== did) batch.update(d.ref, { active: false });
+          });
+          await batch.commit();
+          await registerSession(user);
+        } catch (e) { console.error(e); }
+      }
+
+      function showMultiLoginModal(user) {
+        return new Promise(resolve => {
+          const overlay = document.getElementById('mlOverlay');
+          const btnForce = document.getElementById('mlBtnForce');
+          const btnLogout = document.getElementById('mlBtnLogout');
+          overlay.classList.add('visible');
+
+          btnForce.onclick = async () => {
+            btnForce.disabled = true;
+            btnLogout.disabled = true;
+            btnForce.textContent = '処理中…';
+            await forceLogin(user);
+            overlay.classList.remove('visible');
+            resolve('force');
+          };
+
+          btnLogout.onclick = async () => {
+            btnForce.disabled = true;
+            btnLogout.disabled = true;
+            overlay.classList.remove('visible');
+            resolve('logout');
+          };
+        });
       }
 
       window.signOutEverywhere = async function () {
@@ -342,11 +425,13 @@
         if (!user) { location.href = 'index.html'; return; }
         const ok = await canEnterTool(user);
         if (!ok) {
-          alert('このアカウントは別の端末で使用中です。');
-          // サインアウトしてからリダイレクト（サインアウトしないとindex.htmlが即座にtool.htmlへ戻してループになる）
-          await auth.signOut();
-          location.href = 'index.html';
-          return;
+          const choice = await showMultiLoginModal(user);
+          if (choice === 'logout') {
+            await auth.signOut();
+            location.href = 'index.html';
+            return;
+          }
+          // choice === 'force': forceLogin済みなので続行
         }
 
         const el = document.getElementById('userEmail');
@@ -370,6 +455,19 @@
 </head>
 
 <body>
+  <!-- 多重ログイン警告モーダル -->
+  <div id="mlOverlay" class="ml-overlay" role="dialog" aria-modal="true" aria-labelledby="mlTitle">
+    <div class="ml-card">
+      <div class="ml-icon">⚠️</div>
+      <div id="mlTitle" class="ml-title">別の端末でログイン中です</div>
+      <p class="ml-body">このアカウントは現在、別の端末またはブラウザで使用されています。<br>この端末で強制ログインすると、他の端末のセッションは解除されます。</p>
+      <div class="ml-actions">
+        <button id="mlBtnForce" class="ml-btn-force">この端末で強制ログイン</button>
+        <button id="mlBtnLogout" class="ml-btn-logout">ログアウトして戻る</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ヘッダー -->
   <header class="header">
     <div class="header-logo">
