@@ -363,8 +363,15 @@
           const did = getDeviceId();
           const col = db.collection('users').doc(user.uid).collection('sessions');
           const snap = await col.where('active', '==', true).get();
+          // 15分以上ハートビートがないセッションは期限切れとみなす
+          const threshold = new Date(Date.now() - 15 * 60 * 1000);
           let other = false;
-          snap.forEach(d => { if (d.data().deviceId !== did) other = true; });
+          snap.forEach(d => {
+            if (d.data().deviceId !== did) {
+              const lastSeen = d.data().lastSeenAt?.toDate();
+              if (!lastSeen || lastSeen > threshold) other = true;
+            }
+          });
           if (other) return false;
           await registerSession(user);
           return true;
@@ -459,10 +466,10 @@
   <div id="mlOverlay" class="ml-overlay" role="dialog" aria-modal="true" aria-labelledby="mlTitle">
     <div class="ml-card">
       <div class="ml-icon">⚠️</div>
-      <div id="mlTitle" class="ml-title">別の端末でログイン中です</div>
-      <p class="ml-body">このアカウントは現在、別の端末またはブラウザで使用されています。<br>この端末で強制ログインすると、他の端末のセッションは解除されます。</p>
+      <div id="mlTitle" class="ml-title">セッションが残っています</div>
+      <p class="ml-body">別の端末・ブラウザのセッションが残っています。<br>ブラウザを閉じただけでログアウトしていない場合もこの画面が出ます。<br><br>「全セッションを解除してログイン」を押すと、すべての端末のセッションをリセットしてこの端末でログインできます。</p>
       <div class="ml-actions">
-        <button id="mlBtnForce" class="ml-btn-force">この端末で強制ログイン</button>
+        <button id="mlBtnForce" class="ml-btn-force">🔄 全セッションを解除してログイン</button>
         <button id="mlBtnLogout" class="ml-btn-logout">ログアウトして戻る</button>
       </div>
     </div>
